@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Block Coder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header class="mx-auto max-w-7xl px-4 pt-4 pb-3">
+      <div class="brandBar">
+        <div class="logoMark" aria-hidden="true">
+          <span class="logoMarkInner">BC</span>
+        </div>
+        <div class="min-w-0">
+          <h1 class="brandTitle">
+            Block Coder
+          </h1>
+          <p class="mt-1 text-sm md:text-base text-slate-200/90">
+            Drag blocks into the middle. Press
+            <span class="font-black text-emerald-300">GO</span> to run them!
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-4 pb-6">
+      <div
+        class="grid gap-4 lg:grid-cols-12"
+        aria-label="Block Coder playground"
+      >
+        <!-- Left: Block Palette -->
+        <section
+          class="panel lg:col-span-3"
+          aria-label="Block palette"
+        >
+          <h2 class="panelTitle">Blocks</h2>
+          <p class="panelHint">
+            Drag a block into the workspace.
+          </p>
+
+          <div id="palette" class="mt-3 grid gap-3">
+            <div
+              class="blockCard block-move"
+              draggable="true"
+              data-type="MOVE_FORWARD"
+              role="button"
+              aria-label="Move Forward block"
+              tabindex="0"
+            >
+              Move Forward
+            </div>
+            <div
+              class="blockCard block-turn"
+              draggable="true"
+              data-type="TURN_RIGHT"
+              role="button"
+              aria-label="Turn Right block"
+              tabindex="0"
+            >
+              Turn Right
+            </div>
+            <div
+              class="blockCard block-color"
+              draggable="true"
+              data-type="CHANGE_COLOR"
+              role="button"
+              aria-label="Change Color block"
+              tabindex="0"
+            >
+              Change Color
+            </div>
+            <div
+              class="blockCard block-repeat"
+              draggable="true"
+              data-type="REPEAT"
+              role="button"
+              aria-label="Repeat block"
+              tabindex="0"
+            >
+              Repeat
+            </div>
+          </div>
+
+          <div class="mt-4 rounded-xl border border-slate-700 bg-slate-900/50 p-3">
+            <p class="text-sm text-slate-300">
+              Tip: In the workspace, you can drag blocks to reorder them, or press <span class="font-bold">X</span> to remove.
+            </p>
+          </div>
+        </section>
+
+        <!-- Middle: Workspace -->
+        <section
+          class="panel lg:col-span-5"
+          aria-label="Workspace"
+        >
+          <h2 class="panelTitle">Workspace</h2>
+          <p class="panelHint">
+            Drop blocks here. They will snap into a line.
+          </p>
+
+          <div
+            id="workspaceDropZone"
+            class="mt-3 rounded-2xl border-2 border-dashed border-slate-600 bg-slate-900/40 p-3 min-h-[320px]"
+          >
+            <ul id="workspaceList" class="wsList grid gap-3" aria-label="Workspace blocks"></ul>
+            <div id="emptyWorkspace" class="mt-6 text-center text-slate-400">
+              <div class="text-xl font-extrabold">Drop Blocks Here</div>
+              <div class="mt-1 text-sm">Then press GO!</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: Stage -->
+        <section
+          class="panel lg:col-span-4"
+          aria-label="Stage"
+        >
+          <h2 class="panelTitle">Stage</h2>
+          <p class="panelHint">
+            Watch your sprite follow the blocks.
+          </p>
+
+          <div class="mt-3 rounded-2xl border border-slate-700 bg-slate-900/40 p-3">
+            <canvas
+              id="stage"
+              width="480"
+              height="360"
+              class="w-full rounded-xl bg-slate-950 stageCanvas"
+              aria-label="Stage canvas"
+            ></canvas>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <button
+                id="goBtn"
+                class="kidBtn kidBtnGo"
+                type="button"
+              >
+                GO
+              </button>
+              <button
+                id="stopBtn"
+                class="kidBtn kidBtnStop"
+                type="button"
+                disabled
+              >
+                STOP
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-4 rounded-xl border border-slate-700 bg-slate-900/50 p-3">
+            <div class="text-sm text-slate-300">
+              <div class="font-bold text-slate-100">Goal:</div>
+              Make a tiny program by stacking blocks!
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="mx-auto max-w-7xl px-4 pb-8">
+      <div class="text-xs text-slate-500">
+        Block Coder is a simplified, retro-inspired Scratch-style toy for learners aged 6–8.
+      </div>
+    </footer>
+
+    <!-- Repeat Picker Modal -->
+    <div
+      id="repeatModal"
+      class="fixed inset-0 hidden items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Choose repeat times"
+    >
+      <div class="absolute inset-0 bg-black/70"></div>
+      <div class="relative w-full max-w-md rounded-2xl border-2 border-slate-600 bg-slate-900 p-5 shadow-[0_18px_0_rgba(0,0,0,0.35)]">
+        <div class="flex items-center gap-3">
+          <div class="logoMark" aria-hidden="true" style="width:2.7rem;height:2.7rem;border-radius:0.9rem;">
+            <span class="logoMarkInner">⟲</span>
+          </div>
+          <div class="min-w-0">
+            <div class="text-2xl font-black">Repeat</div>
+            <div class="text-slate-300">How many times?</div>
+          </div>
+        </div>
+
+        <div class="mt-5 grid grid-cols-3 gap-3 items-center">
+          <button id="repeatDec" type="button" class="kidBtn bg-slate-700 text-slate-100">−</button>
+          <div class="text-center">
+            <div id="repeatCount" class="text-5xl font-black text-amber-300 drop-shadow">3</div>
+            <div class="mt-1 text-sm text-slate-300">times</div>
+          </div>
+          <button id="repeatInc" type="button" class="kidBtn bg-slate-700 text-slate-100">+</button>
+        </div>
+
+        <div class="mt-5 grid grid-cols-2 gap-3">
+          <button id="repeatCancel" type="button" class="kidBtn kidBtnStop">Cancel</button>
+          <button id="repeatOk" type="button" class="kidBtn kidBtnGo">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

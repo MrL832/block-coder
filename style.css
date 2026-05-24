@@ -1,0 +1,266 @@
+/* Block Coder: intentionally big, simple, retro-ish */
+
+:root {
+  --shadow: 0 10px 0 rgba(0, 0, 0, 0.35);
+  --ink: #0b1220;
+  --paper: #e2e8f0;
+  --brand: #facc15;
+  --brand2: #60a5fa;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial,
+    "Noto Sans", "Liberation Sans", sans-serif;
+}
+
+.bg-slate-950 {
+  /* give the whole page a subtle "logo poster" vibe */
+  background:
+    radial-gradient(1200px 500px at 20% -10%, rgba(250, 204, 21, 0.20), transparent 60%),
+    radial-gradient(900px 400px at 100% 0%, rgba(96, 165, 250, 0.22), transparent 55%),
+    radial-gradient(900px 600px at 70% 120%, rgba(34, 197, 94, 0.16), transparent 60%),
+    #020617;
+}
+
+.brandBar {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border-radius: 1.25rem;
+  border: 2px solid rgba(148, 163, 184, 0.55);
+  background: rgba(15, 23, 42, 0.55);
+  padding: 0.75rem 1rem;
+  box-shadow: 0 18px 0 rgba(0, 0, 0, 0.25);
+}
+
+.logoMark {
+  flex: 0 0 auto;
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 1rem;
+  border: 3px solid rgba(0, 0, 0, 0.25);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 1), rgba(96, 165, 250, 1));
+  box-shadow: var(--shadow);
+  display: grid;
+  place-items: center;
+}
+
+.logoMarkInner {
+  font-weight: 1000;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+.brandTitle {
+  font-weight: 1000;
+  font-size: 1.6rem;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--paper);
+  text-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(250, 204, 21, 0.16);
+}
+
+.panel {
+  border-radius: 1.25rem;
+  border: 1px solid rgb(51 65 85);
+  background: rgba(15, 23, 42, 0.55);
+  padding: 1rem;
+}
+
+.panelTitle {
+  font-weight: 900;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+.panelHint {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: rgb(203 213 225);
+}
+
+/* Palette blocks */
+.blockCard {
+  user-select: none;
+  cursor: grab;
+  border-radius: 1rem;
+  padding: 1rem 1rem;
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: rgb(15 23 42);
+  border: 3px solid rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
+  transform: translateY(0);
+  transition: transform 80ms ease, filter 80ms ease;
+}
+
+.blockCard:active {
+  cursor: grabbing;
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+}
+
+.blockCard:focus {
+  outline: 4px solid rgba(250, 204, 21, 0.9);
+  outline-offset: 3px;
+}
+
+.block-move {
+  background: rgb(34 197 94);
+}
+.block-turn {
+  background: rgb(59 130 246);
+}
+.block-color {
+  background: rgb(250 204 21);
+}
+.block-sound {
+  background: rgb(244 63 94);
+}
+
+.block-repeat {
+  background: rgb(167 139 250);
+}
+
+/* Workspace blocks (instances) */
+.wsBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  padding: 0.95rem 0.95rem;
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: rgb(15 23 42);
+  border: 3px solid rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
+}
+
+.wsRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.wsBlock[draggable="true"] {
+  cursor: grab;
+}
+.wsBlock[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.wsMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.wsGrip {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 0.4rem;
+  background: rgba(15, 23, 42, 0.25);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: rgba(15, 23, 42, 0.9);
+}
+
+.wsRemove {
+  border-radius: 0.75rem;
+  border: 3px solid rgba(0, 0, 0, 0.25);
+  background: rgba(15, 23, 42, 0.1);
+  padding: 0.4rem 0.65rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+.wsRemove:focus {
+  outline: 4px solid rgba(250, 204, 21, 0.9);
+  outline-offset: 2px;
+}
+
+.wsActive {
+  outline: 5px solid rgba(250, 204, 21, 0.95);
+  outline-offset: 3px;
+}
+
+.repeatInner {
+  width: 100%;
+  border-radius: 0.9rem;
+  border: 3px dashed rgba(15, 23, 42, 0.35);
+  background: rgba(15, 23, 42, 0.18);
+  padding: 0.65rem;
+}
+
+.repeatHint {
+  text-align: center;
+  color: rgba(15, 23, 42, 0.75);
+  font-weight: 1000;
+  font-size: 0.95rem;
+}
+
+.repeatList {
+  margin-top: 0.55rem;
+  display: grid;
+  gap: 0.6rem;
+  min-height: 64px; /* makes it easy to drop blocks inside even when empty */
+}
+
+.repeatList .wsBlock {
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.28);
+}
+
+.dropIndicator {
+  border-radius: 1rem;
+  border: 3px dashed rgba(148, 163, 184, 0.95);
+  padding: 0.9rem;
+  background: rgba(30, 41, 59, 0.35);
+  color: rgb(226 232 240);
+  font-weight: 900;
+  text-align: center;
+}
+
+/* Buttons */
+.kidBtn {
+  border-radius: 1.1rem;
+  padding: 0.95rem 1.2rem;
+  font-weight: 1000;
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+  border: 3px solid rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
+  transition: transform 80ms ease, filter 80ms ease, opacity 120ms ease;
+}
+.kidBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+}
+.kidBtn:focus {
+  outline: 4px solid rgba(250, 204, 21, 0.9);
+  outline-offset: 3px;
+}
+.kidBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kidBtnGo {
+  background: rgb(34 197 94);
+  color: rgb(15 23 42);
+}
+.kidBtnStop {
+  background: rgb(248 113 113);
+  color: rgb(15 23 42);
+}
+
+.stageCanvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
